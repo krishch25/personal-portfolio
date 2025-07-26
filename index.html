@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krish Choudhary - AI & Full-Stack Innovator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 3D & Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* --- Your Original Visually Appealing Style --- */
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-card: #131313;
+            --border-color: #262626;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --accent: #ffffff;
+        }
+
+        html {
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden; /* Ensure no horizontal scroll on body */
+        }
+
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        main {
+            position: relative;
+            z-index: 2;
+            background-color: transparent;
+        }
+        
+        section {
+            background-color: transparent;
+            padding-top: 10rem;
+            padding-bottom: 10rem;
+        }
+        
+        #hero {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .text-shadow {
+             text-shadow: 0px 1px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-title-container {
+            overflow: hidden;
+        }
+        /* This style hides the title by default, GSAP will animate it into view */
+        .section-title {
+            color: var(--accent);
+            transform: translateY(100%);
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                        border-color 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+                        box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: #444;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--bg-dark);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+             background-color: #d4d4d4;
+             transform: scale(1.05);
+        }
+        
+        .btn-secondary {
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            background-color: var(--accent);
+            color: var(--bg-dark);
+            transform: scale(1.05);
+        }
+
+        .line-reveal {
+            overflow: hidden;
+        }
+        .line-reveal > * {
+            transform: translateY(110%);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- The 3D background will be rendered here -->
+    <canvas id="hero-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-semibold tracking-wider text-white">KRISH CHOUDHARY</a>
+            <nav class="hidden md:flex space-x-8 text-sm text-gray-300">
+                <a href="#about" class="hover:text-white transition-colors duration-300">About</a>
+                <a href="#skills" class="hover:text-white transition-colors duration-300">Skills</a>
+                <a href="#experience" class="hover:text-white transition-colors duration-300">Experience</a>
+                <a href="#projects" class="hover:text-white transition-colors duration-300">Projects</a>
+                <a href="#contact" class="hover:text-white transition-colors duration-300">Contact</a>
+            </nav>
+            <button id="mobile-menu-btn" class="md:hidden focus:outline-none">
+                 <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-12 6h12"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-black/80">
+            <a href="#about" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">About</a>
+            <a href="#skills" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Skills</a>
+            <a href="#experience" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Experience</a>
+            <a href="#projects" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Projects</a>
+            <a href="#contact" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Contact</a>
+        </div>
+    </header>
+    
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="h-screen flex items-center justify-center text-center">
+            <div class="relative z-10 px-4">
+                <div class="line-reveal"><h1 class="text-4xl md:text-7xl font-bold mb-4 text-white text-shadow">KRISH CHOUDHARY</h1></div>
+                <div class="line-reveal"><p class="text-lg md:text-xl mb-8 text-gray-300 font-light text-shadow">AI Engineer & Full-Stack Developer</p></div>
+                <!-- FIX: Removed opacity-0 class. GSAP will handle the animation. -->
+                <div id="hero-buttons" class="flex justify-center space-x-4">
+                    <a href="mailto:krishch2502@gmail.com" class="btn-primary font-medium py-3 px-6 rounded-lg">Contact Me</a>
+                    <a href="https://github.com/krishch25" target="_blank" class="btn-secondary font-medium py-3 px-6 rounded-lg">View GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <div class="container mx-auto px-6">
+                <div class="max-w-3xl mx-auto text-center">
+                    <div class="section-title-container mb-6"><h2 class="text-3xl md:text-4xl font-bold section-title text-shadow">About Me</h2></div>
+                    <div class="text-base md:text-lg text-gray-300 leading-relaxed space-y-4 animated-text text-shadow">
+                        <p>I'm a Computer Engineering student at Thapar Institute (2022-2026), specializing in the intersection of Artificial Intelligence and Full-Stack Development. My goal is to build intelligent, scalable, and user-centric applications that solve real-world problems.</p>
+                        <p>Whether architecting autonomous AI workflows or engineering robust enterprise systems, I'm driven by a relentless curiosity and a dedication to pushing the boundaries of what's possible with technology.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills">
+            <div class="container mx-auto px-6 text-center">
+                <div class="section-title-container mb-12"><h2 class="text-3xl md:text-4xl font-bold section-title text-shadow">Core Competencies</h2></div>
+                <div id="skills-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <!-- FIX: Removed opacity-0 from all cards. GSAP will handle the reveal animation. -->
+                    <div class="card p-6 rounded-lg text-left">
+                        <div class="text-gray-400 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3.12 3.12 0 0 0-3.12 3.12V8.88A3.12 3.12 0 0 0 12 12a3.12 3.12 0 0 0 3.12-3.12V5.12A3.12 3.12 0 0 0 12 2z"></path><path d="M19.12 5.12A3.12 3.12 0 0 0 16 2.12v0a3.12 3.12 0 0 0-3.12 3.12v0"></path><path d="M4.88 5.12A3.12 3.12 0 0 1 8 2.12v0a3.12 3.12 0 0 1 3.12 3.12v0"></path><path d="M12 12v10"></path><path d="M16 16.12A3.12 3.12 0 0 1 12.88 19v0a3.12 3.12 0 0 1-3.12 3.12h0a3.12 3.12 0 0 1-3.12-3.12v0"></path></svg></div>
+                        <h3 class="text-lg font-semibold mb-1 text-white">AI & Machine Learning</h3>
+                        <p class="text-gray-400 text-sm">Agentic AI, GenAI, LangChain, TensorFlow, Scikit-learn</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-left">
+                        <div class="text-gray-400 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
+                        <h3 class="text-lg font-semibold mb-1 text-white">Languages</h3>
+                        <p class="text-gray-400 text-sm">Python, C++, C, JavaScript, SQL, R</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-left">
+                        <div class="text-gray-400 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg></div>
+                        <h3 class="text-lg font-semibold mb-1 text-white">Backend & Web</h3>
+                        <p class="text-gray-400 text-sm">Node.js, Express, REST APIs, HTML, CSS</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-left">
+                        <div class="text-gray-400 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
+                        <h3 class="text-lg font-semibold mb-1 text-white">Tools & Platforms</h3>
+                        <p class="text-gray-400 text-sm">Git, GitHub, AWS (IoT Core), Docker, JIRA, Tableau, Power BI</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-left">
+                        <div class="text-gray-400 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg></div>
+                        <h3 class="text-lg font-semibold mb-1 text-white">Databases</h3>
+                        <p class="text-gray-400 text-sm">MySQL, PL/SQL, Firebase, Vector Databases</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-left">
+                        <div class="text-gray-400 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg></div>
+                        <h3 class="text-lg font-semibold mb-1 text-white">Data Science</h3>
+                        <p class="text-gray-400 text-sm">Pandas, Numpy, Statsmodels</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience">
+            <div class="container mx-auto px-6">
+                <div class="section-title-container mb-16 text-center"><h2 class="text-3xl md:text-4xl font-bold section-title text-shadow">Career Journey</h2></div>
+                <div id="experience-timeline" class="relative max-w-3xl mx-auto border-l-2 border-gray-800">
+                    <!-- FIX: Removed opacity-0 from timeline items. -->
+                    <div class="timeline-item mb-12 pl-10 relative">
+                        <div class="absolute -left-1.5 top-1 w-3 h-3 bg-gray-500 rounded-full border-2 border-gray-800"></div>
+                        <p class="text-sm text-gray-500 mb-1">June 2025 - August 2025</p>
+                        <h3 class="text-lg font-semibold text-white">Full-Stack Developer Intern</h3>
+                        <p class="text-gray-400 mb-2">Reliance Infrastructure Ltd.</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Engineered and launched a full-stack meeting management system for 100+ employees. Developed a secure Node.js backend with corporate LDAP authentication and Webex API integration, and implemented a responsive vanilla JavaScript SPA with real-time availability checking and JWT for session management.</p>
+                    </div>
+                    <div class="timeline-item mb-12 pl-10 relative">
+                        <div class="absolute -left-1.5 top-1 w-3 h-3 bg-gray-500 rounded-full border-2 border-gray-800"></div>
+                        <p class="text-sm text-gray-500 mb-1">Dec 2022 - Jan 2023</p>
+                        <h3 class="text-lg font-semibold text-white">Digital Marketing Intern</h3>
+                        <p class="text-gray-400 mb-2">Mood Indigo, IIT Bombay</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Served as a key member of the "Indigo Squad" for one of Asia's largest college cultural festivals, acting as a campus ambassador to drive engagement and promote events.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects">
+            <div class="container mx-auto px-6">
+                <div class="section-title-container mb-12 text-center"><h2 class="text-3xl md:text-4xl font-bold section-title text-shadow">Featured Projects</h2></div>
+                <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- FIX: Removed opacity-0 from project cards. -->
+                    <div class="card rounded-lg overflow-hidden">
+                        <div class="p-6 flex flex-col h-full">
+                            <h3 class="text-lg font-semibold mb-2 text-white">Autonomous AI Agentic Workflows</h3>
+                            <p class="text-gray-400 mb-4 text-sm flex-grow">Architecting a multi-agent system to automate complex business workflows using LLM-driven planning and reasoning for end-to-end task execution.</p>
+                            <div class="flex flex-wrap gap-2 mt-auto">
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">Python</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">LangChain</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">Generative AI</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">n8n</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card rounded-lg overflow-hidden">
+                        <div class="p-6 flex flex-col h-full">
+                            <h3 class="text-lg font-semibold mb-2 text-white">Enterprise Meeting Scheduler</h3>
+                            <p class="text-gray-400 mb-4 text-sm flex-grow">A full-stack meeting scheduler with secure LDAP authentication, real-time availability checking, and automated meeting creation via Webex API integration.</p>
+                            <div class="flex flex-wrap gap-2 mt-auto">
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">Node.js</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">JavaScript</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">JWT</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">LDAP</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card rounded-lg overflow-hidden">
+                        <div class="p-6 flex flex-col h-full">
+                            <h3 class="text-lg font-semibold mb-2 text-white">Energy Consumption Analysis</h3>
+                            <p class="text-gray-400 mb-4 text-sm flex-grow">A predictive model for smart grid optimization using time series analysis and K-Means clustering to forecast household energy usage and segment consumers.</p>
+                            <div class="flex flex-wrap gap-2 mt-auto">
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">Python</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">Pandas</span>
+                                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">Scikit-learn</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="text-center">
+            <div class="container mx-auto px-6">
+                <div class="max-w-xl mx-auto">
+                    <div class="section-title-container mb-6"><h2 class="text-3xl md:text-4xl font-bold section-title text-shadow">Let's Collaborate</h2></div>
+                    <p class="text-gray-300 mb-8 animated-text text-shadow">I'm actively seeking new opportunities and innovative projects. If you have an idea, a question, or just want to connect, my inbox is always open.</p>
+                    <a href="mailto:krishch2502@gmail.com" class="btn-primary text-lg font-medium py-4 px-10 rounded-lg inline-block animated-button">
+                        Say Hello
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-16 bg-transparent text-center text-gray-600 relative z-10">
+        <p>&copy; 2025 Krish Choudhary. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => { 
+            document.getElementById('mobile-menu').classList.toggle('hidden'); 
+        });
+
+        // --- Three.js Network Animation ---
+        let scene, camera, renderer, points, lines;
+        let mouseX = 0, mouseY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+        const particles = [];
+        const particleCount = 300;
+
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
+            camera.position.z = 500;
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const pointGeometry = new THREE.BufferGeometry();
+            const pointMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 2.5,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                opacity: 0.9,
+                sizeAttenuation: true
+            });
+            
+            const positions = [];
+            for (let i = 0; i < particleCount; i++) {
+                const x = Math.random() * 1000 - 500;
+                const y = Math.random() * 1000 - 500;
+                const z = Math.random() * 1000 - 500;
+                positions.push(x, y, z);
+                particles.push({ x, y, z, vx: Math.random() * 0.2 - 0.1, vy: Math.random() * 0.2 - 0.1, vz: Math.random() * 0.2 - 0.1 });
+            }
+            pointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            points = new THREE.Points(pointGeometry, pointMaterial);
+            scene.add(points);
+
+            const lineGeometry = new THREE.BufferGeometry();
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.1,
+                blending: THREE.AdditiveBlending
+            });
+            lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(lines);
+
+            document.addEventListener('mousemove', onDocumentMouseMove);
+            window.addEventListener('resize', onWindowResize);
+            animateThreeJS();
+        }
+
+        function onDocumentMouseMove(event) {
+            mouseX = event.clientX - windowHalfX;
+            mouseY = event.clientY - windowHalfY;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animateThreeJS() {
+            requestAnimationFrame(animateThreeJS);
+            
+            camera.position.x += (mouseX - camera.position.x) * 0.02;
+            camera.position.y += (-mouseY - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
+
+            const positions = points.geometry.attributes.position.array;
+            const linePositions = [];
+            let particle_i, particle_j;
+
+            for (let i = 0; i < particleCount; i++) {
+                particle_i = particles[i];
+                positions[i * 3] += particle_i.vx;
+                positions[i * 3 + 1] += particle_i.vy;
+                positions[i * 3 + 2] += particle_i.vz;
+
+                if (positions[i * 3 + 1] < -500 || positions[i * 3 + 1] > 500) particle_i.vy *= -1;
+                if (positions[i * 3] < -500 || positions[i * 3] > 500) particle_i.vx *= -1;
+                if (positions[i * 3 + 2] < -500 || positions[i * 3 + 2] > 500) particle_i.vz *= -1;
+
+                for (let j = i + 1; j < particleCount; j++) {
+                    particle_j = particles[j];
+                    const dx = positions[i * 3] - positions[j * 3];
+                    const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+                    const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (dist < 120) {
+                        const opacity = 1.0 - (dist / 120);
+                        lines.material.opacity = opacity * 0.2;
+                        linePositions.push(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
+                        linePositions.push(positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2]);
+                    }
+                }
+            }
+            points.geometry.attributes.position.needsUpdate = true;
+            lines.geometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+            
+            renderer.render(scene, camera);
+        }
+
+        initThreeJS();
+
+        // --- GSAP Animations ---
+        // Hero section intro animation
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 1 } });
+        tl.to('.line-reveal > *', { y: 0, stagger: 0.2 })
+          // FIX: Use a .from() animation for the buttons now that opacity-0 is removed
+          .from('#hero-buttons', { opacity: 0, y: 20, duration: 0.8 }, '-=0.5');
+        
+        // Camera zoom and rotation on scroll
+        gsap.to(camera.position, {
+            z: 100,
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.5
+            }
+        });
+        
+        gsap.to(points.rotation, {
+            y: Math.PI * 2,
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.5
+            }
+        });
+
+        // Animate sections on scroll
+        document.querySelectorAll('section:not(#hero)').forEach(section => {
+            // FIX: Changed from .from() to .to() to animate the title into view from its CSS state
+            gsap.to(section.querySelector('.section-title'), {
+                y: 0, // Animate to its original position
+                duration: 1.2,
+                ease: 'expo.out',
+                scrollTrigger: { trigger: section, start: 'top 85%' }
+            });
+
+            // FIX: Use .from() to animate elements that no longer have opacity-0
+            gsap.from(section.querySelectorAll('.card, .timeline-item'), {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                ease: 'power3.out',
+                stagger: 0.15,
+                scrollTrigger: { trigger: section, start: 'top 80%' }
+            });
+            
+            gsap.from(section.querySelectorAll('.animated-text p, .animated-button'), {
+                opacity: 0,
+                y: 30,
+                duration: 1,
+                ease: 'power3.out',
+                stagger: 0.2,
+                scrollTrigger: { trigger: section, start: 'top 75%' }
+            });
+        });
+    });
+    </script>
+</body>
+</html>
